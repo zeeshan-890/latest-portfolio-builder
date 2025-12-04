@@ -99,6 +99,7 @@ interface PortfolioStore {
     // Portfolio sharing state
     currentSlug: string;
     isPublic: boolean;
+    currentPortfolioId: string | null;
 
     // Actions
     setCurrentStep: (step: number) => void;
@@ -114,6 +115,7 @@ interface PortfolioStore {
     setCopied: (copied: boolean) => void;
     setCurrentSlug: (slug: string) => void;
     setIsPublic: (isPublic: boolean) => void;
+    setCurrentPortfolioId: (id: string | null) => void;
 
     // Data Updates
     updatePersonal: (data: Partial<Personal>) => void;
@@ -187,6 +189,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
             copied: false,
             currentSlug: '',
             isPublic: false,
+            currentPortfolioId: null,
 
             // Navigation Actions
             setCurrentStep: (step) => set({ currentStep: step }),
@@ -206,6 +209,7 @@ export const usePortfolioStore = create<PortfolioStore>()(
             setCopied: (copied) => set({ copied: copied }),
             setCurrentSlug: (slug) => set({ currentSlug: slug }),
             setIsPublic: (isPublic) => set({ isPublic: isPublic }),
+            setCurrentPortfolioId: (id) => set({ currentPortfolioId: id }),
 
             // Personal Data
             updatePersonal: (data) =>

@@ -154,7 +154,6 @@ export function apiToStore(portfolio: Portfolio): { data: PortfolioData; theme: 
 export function usePortfolioApi() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [currentPortfolioId, setCurrentPortfolioId] = useState<string | null>(null);
 
     const {
         portfolioData,
@@ -166,6 +165,8 @@ export function usePortfolioApi() {
         setCurrentSlug,
         setIsPublic,
         setShareUrl,
+        currentPortfolioId,
+        setCurrentPortfolioId,
     } = usePortfolioStore();
 
     // Helper to generate share URL from slug
@@ -203,7 +204,7 @@ export function usePortfolioApi() {
         } finally {
             setIsLoading(false);
         }
-    }, [importData, setSelectedTheme, setThemeVariant, setCurrentSlug, setIsPublic, setShareUrl, generateShareUrl]);
+    }, [importData, setSelectedTheme, setThemeVariant, setCurrentSlug, setIsPublic, setShareUrl, generateShareUrl, setCurrentPortfolioId]);
 
     const savePortfolio = useCallback(async () => {
         setIsLoading(true);
@@ -241,7 +242,7 @@ export function usePortfolioApi() {
         } finally {
             setIsLoading(false);
         }
-    }, [portfolioData, selectedTheme, themeVariant, currentPortfolioId, setCurrentSlug, setIsPublic, setShareUrl, generateShareUrl]);
+    }, [portfolioData, selectedTheme, themeVariant, currentPortfolioId, setCurrentSlug, setIsPublic, setShareUrl, generateShareUrl, setCurrentPortfolioId]);
 
     const deletePortfolio = useCallback(async () => {
         if (!currentPortfolioId) return;
@@ -257,17 +258,22 @@ export function usePortfolioApi() {
         } finally {
             setIsLoading(false);
         }
-    }, [currentPortfolioId]);
+    }, [currentPortfolioId, setCurrentPortfolioId]);
 
     const toggleVisibility = useCallback(async () => {
-        if (!currentPortfolioId) return null;
+        if (!currentPortfolioId) {
+            console.error('No portfolio ID available for toggle visibility');
+            return null;
+        }
 
         setIsLoading(true);
         setError(null);
         try {
+            console.log('Toggling visibility for portfolio:', currentPortfolioId);
             const response = await api.togglePortfolioVisibility(currentPortfolioId);
             if (response.success && response.data) {
                 // Update local state with new visibility
+                console.log('New visibility:', response.data.isPublic);
                 setIsPublic(response.data.isPublic || false);
                 return response.data;
             }
