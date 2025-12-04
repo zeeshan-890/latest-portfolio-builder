@@ -64,8 +64,8 @@ const ShareModal = ({ onClose }: ShareModalProps) => {
                                         {isPublic ? 'Public' : 'Private'}
                                     </p>
                                     <p className="text-xs text-gray-400">
-                                        {isPublic 
-                                            ? 'Anyone with the link can view' 
+                                        {isPublic
+                                            ? 'Anyone with the link can view'
                                             : 'Only you can view this portfolio'}
                                     </p>
                                 </div>
@@ -73,17 +73,15 @@ const ShareModal = ({ onClose }: ShareModalProps) => {
                             <button
                                 onClick={handleToggleVisibility}
                                 disabled={isLoading}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                    isPublic ? 'bg-green-600' : 'bg-gray-600'
-                                } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isPublic ? 'bg-green-600' : 'bg-gray-600'
+                                    } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                             >
                                 {isLoading ? (
                                     <Loader2 className="absolute left-1/2 -translate-x-1/2 w-4 h-4 animate-spin text-white" />
                                 ) : (
                                     <span
-                                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                            isPublic ? 'translate-x-6' : 'translate-x-1'
-                                        }`}
+                                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isPublic ? 'translate-x-6' : 'translate-x-1'
+                                            }`}
                                     />
                                 )}
                             </button>
@@ -122,7 +120,7 @@ const ShareModal = ({ onClose }: ShareModalProps) => {
 
                     {/* Preview & Social Share Buttons */}
                     <div className="flex space-x-2">
-                        <button 
+                        <button
                             onClick={openInNewTab}
                             disabled={!shareUrl || !isPublic}
                             className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -130,7 +128,7 @@ const ShareModal = ({ onClose }: ShareModalProps) => {
                             <ExternalLink className="w-4 h-4" />
                             <span>Preview</span>
                         </button>
-                        <button 
+                        <button
                             onClick={() => {
                                 if (shareUrl) {
                                     window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
