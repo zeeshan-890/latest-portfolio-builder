@@ -112,12 +112,12 @@ portfolioSchema.pre('save', async function (next) {
 
         this.slug = slug;
     }
-    
+
     // If still no slug (no name provided), generate a random one
     if (!this.slug) {
         this.slug = `portfolio-${Date.now().toString(36)}`;
     }
-    
+
     next();
 });
 
