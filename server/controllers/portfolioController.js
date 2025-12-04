@@ -129,10 +129,11 @@ const updatePortfolio = async (req, res) => {
             });
         }
 
-        portfolio = await Portfolio.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true,
-        });
+        // Update fields manually to trigger pre-save hook for slug generation
+        Object.assign(portfolio, req.body);
+        await portfolio.save();
+
+        console.log('Portfolio saved with slug:', portfolio.slug);
 
         res.status(200).json({
             success: true,

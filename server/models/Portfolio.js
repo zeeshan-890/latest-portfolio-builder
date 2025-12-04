@@ -95,22 +95,29 @@ const portfolioSchema = new mongoose.Schema(
 
 // Generate unique slug before saving
 portfolioSchema.pre('save', async function (next) {
+    // Generate slug if missing and we have a name
     if (!this.slug && this.personalInfo?.fullName) {
         const baseSlug = this.personalInfo.fullName
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/(^-|-$)/g, '');
 
-        let slug = baseSlug;
+        let slug = baseSlug || 'portfolio';
         let counter = 1;
 
         while (await this.constructor.findOne({ slug, _id: { $ne: this._id } })) {
-            slug = `${baseSlug}-${counter}`;
+            slug = `${baseSlug || 'portfolio'}-${counter}`;
             counter++;
         }
 
         this.slug = slug;
     }
+    
+    // If still no slug (no name provided), generate a random one
+    if (!this.slug) {
+        this.slug = `portfolio-${Date.now().toString(36)}`;
+    }
+    
     next();
 });
 
