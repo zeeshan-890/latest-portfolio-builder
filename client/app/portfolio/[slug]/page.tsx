@@ -3,8 +3,27 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Sparkles, Github, Linkedin, Twitter, Globe, Mail, MapPin, Calendar, ExternalLink } from 'lucide-react';
+import {
+    Sparkles,
+    Github,
+    Linkedin,
+    Twitter,
+    Globe,
+    Mail,
+    Phone,
+    MapPin,
+    Calendar,
+    ExternalLink,
+    Building2,
+    GraduationCap,
+    Briefcase,
+    Award,
+    Trophy,
+    FileText,
+    Star,
+} from 'lucide-react';
 import api, { Portfolio } from '@/app/lib/api';
+import { getPreviewThemeConfig } from '@/app/utils/themes';
 
 export default function PublicPortfolioPage() {
     const params = useParams();
@@ -62,10 +81,28 @@ export default function PublicPortfolioPage() {
         );
     }
 
-    const { personalInfo, education, experience, skills, projects, achievements } = portfolio;
+    const { personalInfo, education, experience, skills, projects, achievements, theme: portfolioTheme } = portfolio;
+
+    // Get the theme configuration based on saved theme settings
+    const selectedTheme = portfolioTheme?.selectedTheme || 'modern';
+    const themeVariant = portfolioTheme?.themeVariant || 'default';
+    const theme = getPreviewThemeConfig(selectedTheme, themeVariant);
+
+    const getAchievementIcon = (type: string) => {
+        switch (type) {
+            case 'award':
+                return <Trophy className="w-5 h-5" />;
+            case 'certification':
+                return <Award className="w-5 h-5" />;
+            case 'publication':
+                return <FileText className="w-5 h-5" />;
+            default:
+                return <Star className="w-5 h-5" />;
+        }
+    };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className={`min-h-screen ${theme.background}`}>
             {/* Navigation */}
             <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -87,75 +124,93 @@ export default function PublicPortfolioPage() {
             </nav>
 
             {/* Hero Section */}
-            <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-4xl mx-auto text-center">
+            <section className={`${theme.heroGradient} pt-24 pb-20`}>
+                <div className="max-w-4xl mx-auto px-6 text-center">
                     {personalInfo.avatar && (
                         <img
                             src={personalInfo.avatar}
                             alt={personalInfo.fullName}
-                            className="w-32 h-32 rounded-full mx-auto mb-6 border-4 border-gray-700 object-cover"
+                            className="w-32 h-32 rounded-full mx-auto mb-6 border-4 border-white/20 object-cover shadow-xl"
                         />
                     )}
-                    <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3">
-                        {personalInfo.fullName}
+                    <h1 className={`text-5xl font-bold mb-4 ${theme.headingColor}`}>
+                        {personalInfo.fullName || 'Your Name'}
                     </h1>
-                    <p className="text-xl text-blue-400 mb-4">{personalInfo.title}</p>
-                    {personalInfo.location && (
-                        <p className="flex items-center justify-center text-gray-400 mb-6">
-                            <MapPin className="w-4 h-4 mr-2" />
-                            {personalInfo.location}
-                        </p>
-                    )}
-                    <p className="text-gray-300 max-w-2xl mx-auto mb-8">{personalInfo.bio}</p>
+                    <p className={`text-2xl mb-6 ${theme.subtitleColor}`}>
+                        {personalInfo.title || 'Professional Title'}
+                    </p>
+                    <p className={`text-lg max-w-2xl mx-auto mb-8 ${theme.textColor}`}>
+                        {personalInfo.bio}
+                    </p>
+
+                    {/* Contact Info */}
+                    <div className="flex flex-wrap justify-center gap-4">
+                        {personalInfo.email && (
+                            <a
+                                href={`mailto:${personalInfo.email}`}
+                                className={`flex items-center space-x-2 px-4 py-2 rounded-full ${theme.badgeBackground} hover:opacity-80 transition-opacity`}
+                            >
+                                <Mail className="w-4 h-4" />
+                                <span>{personalInfo.email}</span>
+                            </a>
+                        )}
+                        {personalInfo.phone && (
+                            <a
+                                href={`tel:${personalInfo.phone}`}
+                                className={`flex items-center space-x-2 px-4 py-2 rounded-full ${theme.badgeBackground} hover:opacity-80 transition-opacity`}
+                            >
+                                <Phone className="w-4 h-4" />
+                                <span>{personalInfo.phone}</span>
+                            </a>
+                        )}
+                        {personalInfo.location && (
+                            <span className={`flex items-center space-x-2 px-4 py-2 rounded-full ${theme.badgeBackground}`}>
+                                <MapPin className="w-4 h-4" />
+                                <span>{personalInfo.location}</span>
+                            </span>
+                        )}
+                    </div>
 
                     {/* Social Links */}
-                    <div className="flex items-center justify-center space-x-4">
-                        {personalInfo.socialLinks.github && (
+                    <div className="flex justify-center gap-4 mt-6">
+                        {personalInfo.socialLinks?.github && (
                             <a
                                 href={personalInfo.socialLinks.github}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-3 bg-gray-800 hover:bg-gray-700 rounded-full transition-colors"
+                                className={`p-3 rounded-full ${theme.iconBackground} hover:opacity-80 transition-opacity`}
                             >
-                                <Github className="w-5 h-5 text-gray-300" />
+                                <Github className="w-5 h-5" />
                             </a>
                         )}
-                        {personalInfo.socialLinks.linkedin && (
+                        {personalInfo.socialLinks?.linkedin && (
                             <a
                                 href={personalInfo.socialLinks.linkedin}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-3 bg-gray-800 hover:bg-gray-700 rounded-full transition-colors"
+                                className={`p-3 rounded-full ${theme.iconBackground} hover:opacity-80 transition-opacity`}
                             >
-                                <Linkedin className="w-5 h-5 text-gray-300" />
+                                <Linkedin className="w-5 h-5" />
                             </a>
                         )}
-                        {personalInfo.socialLinks.twitter && (
+                        {personalInfo.socialLinks?.twitter && (
                             <a
                                 href={personalInfo.socialLinks.twitter}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-3 bg-gray-800 hover:bg-gray-700 rounded-full transition-colors"
+                                className={`p-3 rounded-full ${theme.iconBackground} hover:opacity-80 transition-opacity`}
                             >
-                                <Twitter className="w-5 h-5 text-gray-300" />
+                                <Twitter className="w-5 h-5" />
                             </a>
                         )}
-                        {personalInfo.socialLinks.website && (
+                        {personalInfo.socialLinks?.website && (
                             <a
                                 href={personalInfo.socialLinks.website}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-3 bg-gray-800 hover:bg-gray-700 rounded-full transition-colors"
+                                className={`p-3 rounded-full ${theme.iconBackground} hover:opacity-80 transition-opacity`}
                             >
-                                <Globe className="w-5 h-5 text-gray-300" />
-                            </a>
-                        )}
-                        {personalInfo.email && (
-                            <a
-                                href={`mailto:${personalInfo.email}`}
-                                className="p-3 bg-gray-800 hover:bg-gray-700 rounded-full transition-colors"
-                            >
-                                <Mail className="w-5 h-5 text-gray-300" />
+                                <Globe className="w-5 h-5" />
                             </a>
                         )}
                     </div>
@@ -163,36 +218,42 @@ export default function PublicPortfolioPage() {
             </section>
 
             {/* Skills Section */}
-            {(skills.technical.length > 0 || skills.soft.length > 0) && (
-                <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-800/30">
-                    <div className="max-w-4xl mx-auto">
-                        <h2 className="text-2xl font-bold text-white mb-8 text-center">Skills</h2>
-                        <div className="grid md:grid-cols-2 gap-8">
-                            {skills.technical.length > 0 && (
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-300 mb-4">Technical Skills</h3>
+            {(skills.technical?.length > 0 || skills.soft?.length > 0 || skills.languages?.length > 0) && (
+                <section className={`py-16 ${theme.altBackground}`}>
+                    <div className="max-w-4xl mx-auto px-6">
+                        <h2 className={`text-3xl font-bold mb-8 text-center ${theme.headingColor}`}>Skills & Expertise</h2>
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {skills.technical?.length > 0 && (
+                                <div className={`${theme.cardBackground} rounded-xl p-6`}>
+                                    <h3 className={`text-lg font-semibold mb-4 ${theme.subtitleColor}`}>Technical Skills</h3>
                                     <div className="flex flex-wrap gap-2">
                                         {skills.technical.map((skill, index) => (
-                                            <span
-                                                key={index}
-                                                className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm"
-                                            >
+                                            <span key={index} className={`px-3 py-1 rounded-full text-sm ${theme.skillBadge}`}>
                                                 {skill}
                                             </span>
                                         ))}
                                     </div>
                                 </div>
                             )}
-                            {skills.soft.length > 0 && (
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-300 mb-4">Soft Skills</h3>
+                            {skills.soft?.length > 0 && (
+                                <div className={`${theme.cardBackground} rounded-xl p-6`}>
+                                    <h3 className={`text-lg font-semibold mb-4 ${theme.subtitleColor}`}>Soft Skills</h3>
                                     <div className="flex flex-wrap gap-2">
                                         {skills.soft.map((skill, index) => (
-                                            <span
-                                                key={index}
-                                                className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm"
-                                            >
+                                            <span key={index} className={`px-3 py-1 rounded-full text-sm ${theme.skillBadgeSoft}`}>
                                                 {skill}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            {skills.languages?.length > 0 && (
+                                <div className={`${theme.cardBackground} rounded-xl p-6`}>
+                                    <h3 className={`text-lg font-semibold mb-4 ${theme.subtitleColor}`}>Languages</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {skills.languages.map((lang, index) => (
+                                            <span key={index} className={`px-3 py-1 rounded-full text-sm ${theme.skillBadgeLang}`}>
+                                                {lang}
                                             </span>
                                         ))}
                                     </div>
@@ -205,22 +266,35 @@ export default function PublicPortfolioPage() {
 
             {/* Experience Section */}
             {experience.length > 0 && (
-                <section className="py-16 px-4 sm:px-6 lg:px-8">
-                    <div className="max-w-4xl mx-auto">
-                        <h2 className="text-2xl font-bold text-white mb-8 text-center">Experience</h2>
+                <section className="py-16">
+                    <div className="max-w-4xl mx-auto px-6">
+                        <h2 className={`text-3xl font-bold mb-8 text-center ${theme.headingColor}`}>
+                            <Briefcase className="inline-block w-8 h-8 mr-2 mb-1" />
+                            Work Experience
+                        </h2>
                         <div className="space-y-6">
                             {experience.map((exp, index) => (
-                                <div key={index} className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
-                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
-                                        <h3 className="text-xl font-semibold text-white">{exp.position}</h3>
-                                        <div className="flex items-center text-sm text-gray-400 mt-1 sm:mt-0">
+                                <div key={index} className={`${theme.cardBackground} rounded-xl p-6`}>
+                                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
+                                        <div>
+                                            <h3 className={`text-xl font-semibold ${theme.headingColor}`}>{exp.position}</h3>
+                                            <p className={`${theme.accentColor} flex items-center mt-1`}>
+                                                <Building2 className="w-4 h-4 mr-2" />
+                                                {exp.company}
+                                            </p>
+                                        </div>
+                                        <div className={`flex items-center ${theme.mutedColor} text-sm mt-2 sm:mt-0`}>
                                             <Calendar className="w-4 h-4 mr-1" />
                                             {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
                                         </div>
                                     </div>
-                                    <p className="text-blue-400 mb-2">{exp.company}</p>
-                                    {exp.location && <p className="text-sm text-gray-400 mb-3">{exp.location}</p>}
-                                    <p className="text-gray-300">{exp.description}</p>
+                                    {exp.location && (
+                                        <p className={`${theme.mutedColor} text-sm mb-3 flex items-center`}>
+                                            <MapPin className="w-4 h-4 mr-1" />
+                                            {exp.location}
+                                        </p>
+                                    )}
+                                    <p className={theme.textColor}>{exp.description}</p>
                                 </div>
                             ))}
                         </div>
@@ -230,12 +304,12 @@ export default function PublicPortfolioPage() {
 
             {/* Projects Section */}
             {projects.length > 0 && (
-                <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-800/30">
-                    <div className="max-w-4xl mx-auto">
-                        <h2 className="text-2xl font-bold text-white mb-8 text-center">Projects</h2>
+                <section className={`py-16 ${theme.altBackground}`}>
+                    <div className="max-w-5xl mx-auto px-6">
+                        <h2 className={`text-3xl font-bold mb-8 text-center ${theme.headingColor}`}>Featured Projects</h2>
                         <div className="grid md:grid-cols-2 gap-6">
                             {projects.map((project, index) => (
-                                <div key={index} className="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-700/50">
+                                <div key={index} className={`${theme.cardBackground} rounded-xl overflow-hidden ${project.featured ? 'ring-2 ring-yellow-500/50' : ''}`}>
                                     {project.image && (
                                         <img
                                             src={project.image}
@@ -244,25 +318,27 @@ export default function PublicPortfolioPage() {
                                         />
                                     )}
                                     <div className="p-6">
-                                        <h3 className="text-xl font-semibold text-white mb-2">{project.title}</h3>
-                                        <p className="text-gray-300 mb-4 text-sm">{project.description}</p>
+                                        <div className="flex items-start justify-between mb-2">
+                                            <h3 className={`text-xl font-semibold ${theme.headingColor}`}>{project.title}</h3>
+                                            {project.featured && (
+                                                <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                                            )}
+                                        </div>
+                                        <p className={`${theme.textColor} mb-4 text-sm`}>{project.description}</p>
                                         <div className="flex flex-wrap gap-2 mb-4">
-                                            {project.technologies.map((tech, techIndex) => (
-                                                <span
-                                                    key={techIndex}
-                                                    className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-xs"
-                                                >
+                                            {project.technologies?.map((tech, techIndex) => (
+                                                <span key={techIndex} className={`px-2 py-1 rounded text-xs ${theme.techBadge}`}>
                                                     {tech}
                                                 </span>
                                             ))}
                                         </div>
-                                        <div className="flex items-center space-x-4">
+                                        <div className="flex items-center gap-4">
                                             {project.liveUrl && (
                                                 <a
                                                     href={project.liveUrl}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="flex items-center text-sm text-blue-400 hover:text-blue-300"
+                                                    className={`flex items-center text-sm ${theme.linkColor} hover:opacity-80`}
                                                 >
                                                     <ExternalLink className="w-4 h-4 mr-1" />
                                                     Live Demo
@@ -273,10 +349,10 @@ export default function PublicPortfolioPage() {
                                                     href={project.githubUrl}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="flex items-center text-sm text-gray-400 hover:text-gray-300"
+                                                    className={`flex items-center text-sm ${theme.mutedColor} hover:opacity-80`}
                                                 >
                                                     <Github className="w-4 h-4 mr-1" />
-                                                    Source
+                                                    Source Code
                                                 </a>
                                             )}
                                         </div>
@@ -290,21 +366,27 @@ export default function PublicPortfolioPage() {
 
             {/* Education Section */}
             {education.length > 0 && (
-                <section className="py-16 px-4 sm:px-6 lg:px-8">
-                    <div className="max-w-4xl mx-auto">
-                        <h2 className="text-2xl font-bold text-white mb-8 text-center">Education</h2>
+                <section className="py-16">
+                    <div className="max-w-4xl mx-auto px-6">
+                        <h2 className={`text-3xl font-bold mb-8 text-center ${theme.headingColor}`}>
+                            <GraduationCap className="inline-block w-8 h-8 mr-2 mb-1" />
+                            Education
+                        </h2>
                         <div className="space-y-6">
                             {education.map((edu, index) => (
-                                <div key={index} className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
-                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
-                                        <h3 className="text-xl font-semibold text-white">{edu.degree}</h3>
-                                        <div className="flex items-center text-sm text-gray-400 mt-1 sm:mt-0">
+                                <div key={index} className={`${theme.cardBackground} rounded-xl p-6`}>
+                                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
+                                        <div>
+                                            <h3 className={`text-xl font-semibold ${theme.headingColor}`}>{edu.degree}</h3>
+                                            <p className={`${theme.accentColor} mt-1`}>{edu.institution}</p>
+                                            {edu.field && <p className={`${theme.mutedColor} text-sm`}>{edu.field}</p>}
+                                        </div>
+                                        <div className={`flex items-center ${theme.mutedColor} text-sm mt-2 sm:mt-0`}>
                                             <Calendar className="w-4 h-4 mr-1" />
                                             {edu.startDate} - {edu.endDate}
                                         </div>
                                     </div>
-                                    <p className="text-blue-400 mb-2">{edu.institution}</p>
-                                    {edu.description && <p className="text-gray-300">{edu.description}</p>}
+                                    {edu.description && <p className={theme.textColor}>{edu.description}</p>}
                                 </div>
                             ))}
                         </div>
@@ -314,18 +396,28 @@ export default function PublicPortfolioPage() {
 
             {/* Achievements Section */}
             {achievements.length > 0 && (
-                <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-800/30">
-                    <div className="max-w-4xl mx-auto">
-                        <h2 className="text-2xl font-bold text-white mb-8 text-center">Achievements</h2>
+                <section className={`py-16 ${theme.altBackground}`}>
+                    <div className="max-w-4xl mx-auto px-6">
+                        <h2 className={`text-3xl font-bold mb-8 text-center ${theme.headingColor}`}>
+                            <Award className="inline-block w-8 h-8 mr-2 mb-1" />
+                            Achievements
+                        </h2>
                         <div className="grid md:grid-cols-2 gap-6">
                             {achievements.map((achievement, index) => (
-                                <div key={index} className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
-                                    <h3 className="text-lg font-semibold text-white mb-2">{achievement.title}</h3>
-                                    <p className="text-blue-400 text-sm mb-2">{achievement.issuer}</p>
-                                    <p className="text-gray-400 text-sm mb-3">{achievement.date}</p>
-                                    {achievement.description && (
-                                        <p className="text-gray-300 text-sm">{achievement.description}</p>
-                                    )}
+                                <div key={index} className={`${theme.cardBackground} rounded-xl p-6`}>
+                                    <div className="flex items-start gap-4">
+                                        <div className={`p-3 rounded-lg ${theme.iconBackground}`}>
+                                            {getAchievementIcon(achievement.url || 'other')}
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className={`text-lg font-semibold ${theme.headingColor}`}>{achievement.title}</h3>
+                                            <p className={`${theme.accentColor} text-sm`}>{achievement.issuer}</p>
+                                            <p className={`${theme.mutedColor} text-sm mb-2`}>{achievement.date}</p>
+                                            {achievement.description && (
+                                                <p className={`${theme.textColor} text-sm`}>{achievement.description}</p>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -334,11 +426,11 @@ export default function PublicPortfolioPage() {
             )}
 
             {/* Footer */}
-            <footer className="py-8 px-4 sm:px-6 lg:px-8 border-t border-gray-800">
-                <div className="max-w-4xl mx-auto text-center">
-                    <p className="text-gray-400 text-sm">
+            <footer className={`py-8 ${theme.footerBackground} border-t border-gray-700/50`}>
+                <div className="max-w-4xl mx-auto px-6 text-center">
+                    <p className={`${theme.mutedColor} text-sm`}>
                         Built with{' '}
-                        <Link href="/" className="text-blue-400 hover:text-blue-300">
+                        <Link href="/" className={`${theme.linkColor} hover:opacity-80`}>
                             PortfolioBuilder
                         </Link>
                     </p>
