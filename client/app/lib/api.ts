@@ -1,6 +1,5 @@
-// API URL - use environment variable or default to same-origin /api
-const API_URL = process.env.NEXT_PUBLIC_API_URL ||
-    (typeof window !== 'undefined' ? `${window.location.origin}/api` : 'http://localhost:5000/api');
+// API URL - always use relative /api path (works both in dev and production behind nginx)
+const API_URL = '/api';
 
 interface ApiResponse<T = unknown> {
     success: boolean;
