@@ -1,0 +1,42 @@
+# Dependencies
+node_modules
+client/node_modules
+server/node_modules
+
+# Build outputs
+client/.next
+client/out
+
+# Git
+.git
+.gitignore
+
+# SSH Keys
+.ssh
+
+# Environment files (will be set in CapRover)
+.env
+.env.*
+client/.env
+client/.env.*
+server/.env
+server/.env.*
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+README.md
+*.md
+coverage
