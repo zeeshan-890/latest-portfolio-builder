@@ -163,7 +163,18 @@ export function usePortfolioApi() {
         importData,
         setSelectedTheme,
         setThemeVariant,
+        setCurrentSlug,
+        setIsPublic,
+        setShareUrl,
     } = usePortfolioStore();
+
+    // Helper to generate share URL from slug
+    const generateShareUrl = useCallback((slug: string) => {
+        if (typeof window !== 'undefined') {
+            return `${window.location.origin}/portfolio/${slug}`;
+        }
+        return '';
+    }, []);
 
     const loadPortfolios = useCallback(async () => {
         setIsLoading(true);
@@ -177,6 +188,12 @@ export function usePortfolioApi() {
                 importData(data);
                 setSelectedTheme(theme.selectedTheme);
                 setThemeVariant(theme.themeVariant);
+                // Set slug and visibility state
+                setCurrentSlug(portfolio.slug || '');
+                setIsPublic(portfolio.isPublic || false);
+                if (portfolio.slug) {
+                    setShareUrl(generateShareUrl(portfolio.slug));
+                }
                 return portfolio;
             }
             return null;
@@ -186,7 +203,7 @@ export function usePortfolioApi() {
         } finally {
             setIsLoading(false);
         }
-    }, [importData, setSelectedTheme, setThemeVariant]);
+    }, [importData, setSelectedTheme, setThemeVariant, setCurrentSlug, setIsPublic, setShareUrl, generateShareUrl]);
 
     const savePortfolio = useCallback(async () => {
         setIsLoading(true);
@@ -194,17 +211,28 @@ export function usePortfolioApi() {
         try {
             const portfolioPayload = storeToApi(portfolioData, { selectedTheme, themeVariant });
 
+            let portfolio: Portfolio | undefined;
             if (currentPortfolioId) {
                 const response = await api.updatePortfolio(currentPortfolioId, portfolioPayload);
-                if (response.success) {
-                    return response.data;
+                if (response.success && response.data) {
+                    portfolio = response.data;
                 }
             } else {
                 const response = await api.createPortfolio(portfolioPayload);
                 if (response.success && response.data) {
                     setCurrentPortfolioId(response.data._id);
-                    return response.data;
+                    portfolio = response.data;
                 }
+            }
+
+            if (portfolio) {
+                // Set slug and visibility state after save
+                setCurrentSlug(portfolio.slug || '');
+                setIsPublic(portfolio.isPublic || false);
+                if (portfolio.slug) {
+                    setShareUrl(generateShareUrl(portfolio.slug));
+                }
+                return portfolio;
             }
             throw new Error('Failed to save portfolio');
         } catch (err) {
@@ -213,7 +241,7 @@ export function usePortfolioApi() {
         } finally {
             setIsLoading(false);
         }
-    }, [portfolioData, selectedTheme, themeVariant, currentPortfolioId]);
+    }, [portfolioData, selectedTheme, themeVariant, currentPortfolioId, setCurrentSlug, setIsPublic, setShareUrl, generateShareUrl]);
 
     const deletePortfolio = useCallback(async () => {
         if (!currentPortfolioId) return;
@@ -238,7 +266,9 @@ export function usePortfolioApi() {
         setError(null);
         try {
             const response = await api.togglePortfolioVisibility(currentPortfolioId);
-            if (response.success) {
+            if (response.success && response.data) {
+                // Update local state with new visibility
+                setIsPublic(response.data.isPublic || false);
                 return response.data;
             }
             throw new Error('Failed to toggle visibility');
@@ -248,7 +278,7 @@ export function usePortfolioApi() {
         } finally {
             setIsLoading(false);
         }
-    }, [currentPortfolioId]);
+    }, [currentPortfolioId, setIsPublic]);
 
     return {
         isLoading,

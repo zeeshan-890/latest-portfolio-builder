@@ -28,6 +28,8 @@ const Header = () => {
         setShareUrl,
         portfolioData,
         importData,
+        currentSlug,
+        shareUrl,
     } = usePortfolioStore();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -54,11 +56,27 @@ const Header = () => {
         router.push('/');
     };
 
-    const generateShareUrl = () => {
-        const baseUrl = 'https://portfolio-builder.app/share/';
-        const portfolioId = Date.now().toString(36);
-        const url = `${baseUrl}${portfolioId}`;
-        setShareUrl(url);
+    const handleShare = async () => {
+        if (!isAuthenticated) {
+            router.push('/login');
+            return;
+        }
+
+        // If no slug yet, save first to get one
+        if (!currentSlug) {
+            setSaveStatus('saving');
+            try {
+                await savePortfolio();
+                setSaveStatus('saved');
+                setTimeout(() => setSaveStatus('idle'), 2000);
+            } catch {
+                setSaveStatus('error');
+                setTimeout(() => setSaveStatus('idle'), 3000);
+                return;
+            }
+        }
+
+        // Now show the share modal (URL was set during save)
         setShowShareModal(true);
     };
 
@@ -180,7 +198,7 @@ const Header = () => {
                         </button>
 
                         <button
-                            onClick={generateShareUrl}
+                            onClick={handleShare}
                             className="flex items-center space-x-2 px-3 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors text-sm"
                         >
                             <Share2 className="w-4 h-4" />
